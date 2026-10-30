@@ -1,0 +1,247 @@
+<?xml version='1.0' encoding='utf-8'?>
+<?xml-model href="rfc7991bis.rnc"?>
+<!DOCTYPE rfc [
+  <!ENTITY nbsp    "&#160;">
+  <!ENTITY zwsp   "&#8203;">
+  <!ENTITY nbhy   "&#8209;">
+  <!ENTITY wj     "&#8288;">
+]>
+<rfc
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  category="std"
+  docName="draft-pmohapat-nvo3-gnserv-00"
+  ipr="trust200902"
+  obsoletes=""
+  updates=""
+  submissionType="IETF"
+  xml:lang="en"
+  version="3"
+  consensus="true">
+  <front>
+    <title abbrev="Geneve network service option">Geneve network service interfaces option class</title>
+
+    <seriesInfo name="Internet-Draft" value="draft-pmohapat-nvo3-gnserv-00"/>
+
+    <author fullname="Victor Moreno" initials="V." surname="Moreno">
+      <organization>Google</organization>
+      <address>
+        <email>vimoreno@google.com</email>
+      </address>
+    </author>
+    <author fullname="Pradosh Mohapatra" initials="P." surname="Mohapatra">
+      <organization>Spinglass</organization>
+      <address>
+        <email>pradosh@spinglass.co</email>
+      </address>
+    </author>
+    <author fullname="Pankaj Bhagra" initials="P." surname="Bhagra">
+      <organization>Palo Alto Networks</organization>
+      <address>
+        <email>pankaj@paloaltonetworks.com</email>
+      </address>
+    </author>
+
+    <date year="2026"/>
+
+    <area>nvo3</area>
+    <workgroup>nvo3</workgroup>
+
+    <keyword>Geneve Option class</keyword>
+
+    <abstract>
+      <t>
+        This specification defines a new Geneve Option Class and a
+        registration procedure for corresponding option types that can
+        be used for the exchange of metadata between network service
+        domains. The metadata enables implementation of coordinated
+        network service functionality across domains by carrying extra
+        context.
+      </t>
+    </abstract>
+
+  </front>
+
+  <middle>
+    <section>
+      <name>Introduction</name>
+      <t>
+        Following the publication of <xref target="RFC8926"/>, IANA
+        created a registry <xref target="IANA-GENEVE-CLASSES"/> to
+        manage the option class space.  The option classes so far have
+        been reserved for private use by different organizations from
+        the “First come first served” range.
+      </t>
+
+      <t>
+        As enterprises evolve their network to span carriers,
+        co-locations and public clouds, there is a desire to integrate
+        with best-of-the- breed network and security services in a
+        flexible and interoperable fashion. In many cases, these
+        network service functionalities are offered as a managed
+        service, which is usually hosted in a separate and independent
+        network. This is a departure from the traditional model of
+        enterprise network administrators managing service appliances
+        within their premises. Geneve is increasingly being adopted as
+        the encapsulation protocol to tie these disparate networks
+        together and offer coordinated services. At the point where a
+        service needs to be applied to an enterprise’s traffic,
+        network elements encapsulate the traffic over an on-demand
+        Geneve overlay to a service endpoint while ensuring tenant
+        isolation. Geneve options carry extra context across domains
+        to be used while applying the service. Below is a sample
+        topology where Geneve tunnel is used to carry the traffic from
+        a cloud provider to the security service provider to apply
+        security and get the traffic back to the destination.
+      </t>
+      <figure>
+        <name> Example topology </name>
+        <artwork><![CDATA[
+                 +----------------------+
+                 |     Security service |
+                 |      provider        |
+                 +----------------------+
+                         ('')
+                         |  |
+                         |  | GENEVE
+                         |  | tunnel
+                     [3] |  |
+                         |  | [4]
+                         (,,)
+                 +------------------------------+
+                 |Public         [5]            |
+                 |Cloud        .----------~     |
+                 |             |Enterprise|     |
+                 |             |resources |     |
+                 |             `----------'     |
+                 +------------------------------+
+                          ||
+                          || [2]
+      +----------+     +--------+
+      |Enterprise| [1] |Co-     |
+      | Network  |=====|Location|
+      +----------+     +--------+
+
+        ]]></artwork>
+      </figure>
+
+      <t>
+        This specification proposes a standard option class subrange
+        under the “IETF review” range for such purposes, called
+        “Network service interfaces Option Class”. It enables an
+        “implement once and offer everywhere” approach that vendors
+        and providers can leverage.
+      </t>
+
+      <section>
+        <name>Requirements Language</name>
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+          "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
+          RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+          interpreted as described in BCP 14 <xref target="RFC2119"/>
+          <xref target="RFC8174"/> when, and only when, they appear in
+          all capitals, as shown here.</t>
+      </section>
+    </section>
+
+    <section>
+      <name>Discussion</name>
+      <t>
+      </t>
+    </section>
+
+    <section>
+      <name>Options</name>
+      <t>
+        Under the first option class in “network service interfaces
+        option class” subrange, this specification defines the
+        following option types.
+      </t>
+      <section>
+      <name>Origin Location</name>
+      <t>
+
+        To serve localized content to end users, a network service may
+        require the country of origin of the user traffic.  This
+        information is exchanged in a new option type called “origin
+        location” that encodes the 10-bit country/subdivision code as
+        standardized in ISO- 3166-2
+        [http://en.wikipedia.org/wiki/ISO_3166].  The format is as
+        follows:
+      </t>
+
+      <figure>
+	<name> Origin Location option type </name>
+        <artwork><![CDATA[
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |  Option Class = [TBD]         |   Type = 1    |R|R|R| Len = 1 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |              ISO-3166-2 country/subdivision code              |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        ]]></artwork>
+      </figure>
+
+      </section>
+    </section>
+
+    <section>
+      <name>Deployment and Operational Considerations</name>
+      <t>
+      </t>
+    </section>
+
+    <section anchor="IANA">
+      <name>IANA Considerations</name>
+      <t>
+
+        IANA is requested to assign a new option class subrange from
+        the “IETF Review” range to be called “Network service
+        interfaces Option Class”. The suggested subrange is 0x0000 -
+        0x0009.  IANA is also requested to maintain a new option type
+        registry per option class in this subrange on a “First come
+        first served” basis.
+
+      </t>
+    </section>
+
+    <section anchor="Security">
+        <name>Security Considerations</name>
+      <t>
+      </t>
+    </section>
+
+    <!-- NOTE: The Acknowledgements and Contributors sections are at the end of this template -->
+  </middle>
+
+  <back>
+    <references>
+      <name>References</name>
+      <references>
+        <name>Normative References</name>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2119.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8174.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8926.xml"/>
+      </references>
+
+      <references>
+        <name>Informative References</name>
+        <reference anchor="IANA-GENEVE-CLASSES" target="http://www.iana.org/assignments/nvo3/nvo3.xhtml">
+          <front>
+            <title>Geneve Classes</title>
+            <author>
+              <organization>IANA</organization>
+            </author>
+          </front>
+        </reference>
+      </references>
+
+    </references>
+
+    <section anchor="Acknowledgements" numbered="false">
+      <!-- [REPLACE/DELETE] an Acknowledgements section is optional -->
+      <name>Acknowledgements</name>
+      <t>
+      </t>
+    </section>
+ </back>
+</rfc>

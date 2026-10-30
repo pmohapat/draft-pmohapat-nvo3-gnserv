@@ -1,0 +1,221 @@
+
+
+
+
+nvo3                                                           V. Moreno
+Internet-Draft                                                    Google
+Intended status: Standards Track                            P. Mohapatra
+Expires: 2 May 2027                                            Spinglass
+                                                               P. Bhagra
+                                                      Palo Alto Networks
+                                                         29 October 2026
+
+
+             Geneve network service interfaces option class
+                     draft-pmohapat-nvo3-gnserv-00
+
+Abstract
+
+   This specification defines a new Geneve Option Class and a
+   registration procedure for corresponding option types that can be
+   used for the exchange of metadata between network service domains.
+   The metadata enables implementation of coordinated network service
+   functionality across domains by carrying extra context.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 2 May 2027.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+     1.1.  Requirements Language
+   2.  Discussion
+   3.  Options
+     3.1.  Origin Location
+   4.  Deployment and Operational Considerations
+   5.  IANA Considerations
+   6.  Security Considerations
+   7.  References
+     7.1.  Normative References
+     7.2.  Informative References
+   Acknowledgements
+   Authors' Addresses
+
+1.  Introduction
+
+   Following the publication of [RFC8926], IANA created a registry
+   [IANA-GENEVE-CLASSES] to manage the option class space.  The option
+   classes so far have been reserved for private use by different
+   organizations from the “First come first served” range.
+
+   As enterprises evolve their network to span carriers, co-locations
+   and public clouds, there is a desire to integrate with best-of-the-
+   breed network and security services in a flexible and interoperable
+   fashion.  In many cases, these network service functionalities are
+   offered as a managed service, which is usually hosted in a separate
+   and independent network.  This is a departure from the traditional
+   model of enterprise network administrators managing service
+   appliances within their premises.  Geneve is increasingly being
+   adopted as the encapsulation protocol to tie these disparate networks
+   together and offer coordinated services.  At the point where a
+   service needs to be applied to an enterprise’s traffic, network
+   elements encapsulate the traffic over an on-demand Geneve overlay to
+   a service endpoint while ensuring tenant isolation.  Geneve options
+   carry extra context across domains to be used while applying the
+   service.  Below is a sample topology where Geneve tunnel is used to
+   carry the traffic from a cloud provider to the security service
+   provider to apply security and get the traffic back to the
+   destination.
+
+                    +----------------------+
+                    |     Security service |
+                    |      provider        |
+                    +----------------------+
+                            ('')
+                            |  |
+                            |  | GENEVE
+                            |  | tunnel
+                        [3] |  |
+                            |  | [4]
+                            (,,)
+                    +------------------------------+
+                    |Public         [5]            |
+                    |Cloud        .----------~     |
+                    |             |Enterprise|     |
+                    |             |resources |     |
+                    |             `----------'     |
+                    +------------------------------+
+                             ||
+                             || [2]
+         +----------+     +--------+
+         |Enterprise| [1] |Co-     |
+         | Network  |=====|Location|
+         +----------+     +--------+
+
+
+                         Figure 1: Example topology
+
+   This specification proposes a standard option class subrange under
+   the “IETF review” range for such purposes, called “Network service
+   interfaces Option Class”. It enables an “implement once and offer
+   everywhere” approach that vendors and providers can leverage.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+2.  Discussion
+
+
+3.  Options
+
+   Under the first option class in “network service interfaces option
+   class” subrange, this specification defines the following option
+   types.
+
+3.1.  Origin Location
+
+   To serve localized content to end users, a network service may
+   require the country of origin of the user traffic.  This information
+   is exchanged in a new option type called “origin location” that
+   encodes the 10-bit country/subdivision code as standardized in ISO-
+   3166-2 [http://en.wikipedia.org/wiki/ISO_3166].  The format is as
+   follows:
+
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |  Option Class = [TBD]         |   Type = 1    |R|R|R| Len = 1 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |              ISO-3166-2 country/subdivision code              |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                Figure 2: Origin Location option type
+
+4.  Deployment and Operational Considerations
+
+
+5.  IANA Considerations
+
+   IANA is requested to assign a new option class subrange from the
+   “IETF Review” range to be called “Network service interfaces Option
+   Class”. The suggested subrange is 0x0000 - 0x0009.  IANA is also
+   requested to maintain a new option type registry per option class in
+   this subrange on a “First come first served” basis.
+
+6.  Security Considerations
+
+
+7.  References
+
+7.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [RFC8926]  Gross, J., Ed., Ganga, I., Ed., and T. Sridhar, Ed.,
+              "Geneve: Generic Network Virtualization Encapsulation",
+              RFC 8926, DOI 10.17487/RFC8926, November 2020,
+              <https://www.rfc-editor.org/info/rfc8926>.
+
+7.2.  Informative References
+
+   [IANA-GENEVE-CLASSES]
+              IANA, "Geneve Classes",
+              <http://www.iana.org/assignments/nvo3/nvo3.xhtml>.
+
+Acknowledgements
+
+
+Authors' Addresses
+
+   Victor Moreno
+   Google
+   Email: vimoreno@google.com
+
+
+   Pradosh Mohapatra
+   Spinglass
+   Email: pradosh@spinglass.co
+
+
+   Pankaj Bhagra
+   Palo Alto Networks
+   Email: pankaj@paloaltonetworks.com
