@@ -5,10 +5,10 @@
 nvo3                                                           V. Moreno
 Internet-Draft                                                    Google
 Intended status: Standards Track                            P. Mohapatra
-Expires: 2 May 2027                                            Spinglass
+Expires: 4 May 2027                                            Spinglass
                                                                P. Bhagra
                                                       Palo Alto Networks
-                                                         29 October 2026
+                                                         31 October 2026
 
 
              Geneve network service interfaces option class
@@ -37,7 +37,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 May 2027.
+   This Internet-Draft will expire on 4 May 2027.
 
 Copyright Notice
 
@@ -57,7 +57,7 @@ Table of Contents
 
    1.  Introduction
      1.1.  Requirements Language
-   2.  Discussion
+   2.  Use cases
    3.  Options
      3.1.  Origin Location
    4.  Deployment and Operational Considerations
@@ -83,17 +83,34 @@ Table of Contents
    offered as a managed service, which is usually hosted in a separate
    and independent network.  This is a departure from the traditional
    model of enterprise network administrators managing service
-   appliances within their premises.  Geneve is increasingly being
-   adopted as the encapsulation protocol to tie these disparate networks
-   together and offer coordinated services.  At the point where a
-   service needs to be applied to an enterprise’s traffic, network
-   elements encapsulate the traffic over an on-demand Geneve overlay to
-   a service endpoint while ensuring tenant isolation.  Geneve options
-   carry extra context across domains to be used while applying the
-   service.  Below is a sample topology where Geneve tunnel is used to
-   carry the traffic from a cloud provider to the security service
-   provider to apply security and get the traffic back to the
-   destination.
+   appliances within their premises.
+
+   Geneve is increasingly being adopted as the encapsulation protocol to
+   tie these disparate networks together and offer coordinated services.
+   At the point where a service needs to be applied to an enterprise’s
+   traffic, network elements encapsulate the traffic over an on-demand
+   Geneve overlay to a service endpoint while ensuring tenant isolation
+   for the enterprise consuming the services.  Geneve options carry
+   extra context across domains to be used while applying the service.
+
+   This specification proposes a standard option class subrange under
+   the “IETF review” range for such purposes, called “Network service
+   interfaces Option Class”. It enables an “implement once and offer
+   everywhere” approach that vendors and providers can leverage.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+2.  Use cases
+
+   Below is a sample topology where Geneve tunnel is used to carry the
+   traffic from a cloud provider to the security service provider to
+   apply security and get the traffic back to the destination.
 
                     +----------------------+
                     |     Security service |
@@ -101,7 +118,7 @@ Table of Contents
                     +----------------------+
                             ('')
                             |  |
-                            |  | GENEVE
+                            |  | Geneve
                             |  | tunnel
                         [3] |  |
                             |  | [4]
@@ -120,26 +137,48 @@ Table of Contents
          | Network  |=====|Location|
          +----------+     +--------+
 
+                        Figure 1: Example topology 1
 
-                         Figure 1: Example topology
+   Below is another topology that demonstrates tenant isolation, along
+   with the presence of enterprise network footprint across cloud
+   providers.  Each enterprise's network traffic is carried in separate
+   Geneve tunnel, ensuring isolation.
 
-   This specification proposes a standard option class subrange under
-   the “IETF review” range for such purposes, called “Network service
-   interfaces Option Class”. It enables an “implement once and offer
-   everywhere” approach that vendors and providers can leverage.
+                Network services provider domain
+                +-------------------------------------------+
+                |           .                               |
+                |         .   .                             |
+                +--------.-----.----------------------------+
+                     ||  .     .Geneve
+                     ||  .     .Tunnel
+                     ||  .     .
+                     ||  .     .
+            +-------------\----/--------+         +------------------------+
+            |    Cloud provider 1       |         |    Cloud provider 2    |
+            |               : :         |         |                        |
+            | +----------+ +----------+ |         | +----------+           |
+            | |enterprise| |enterprise| |         | |enterprise|           |
+            | |  1       | |   2      | |<------->| |  2       |           |
+            | |virtual   | |virtual   | |         | |virtual   |           |
+            | |network   | |network   | |         | |network   |           |
+            | +--|-------+ +--|-------+ |         | +----------+           |
+            +----|------------|---------+         +------------------------+
+                 |            |
+            +----+-----+  +---+------+
+            |enterprise|  |enterprise|
+            |  1       |  |  2       |
+            |on-prem   |  |on-prem   |
+            |network   |  |network   |
+            +----------+  +----------+
 
-1.1.  Requirements Language
-
-   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in BCP
-   14 [RFC2119] [RFC8174] when, and only when, they appear in all
-   capitals, as shown here.
-
-2.  Discussion
-
+                     Figure 2: Example topology 2
 
 3.  Options
+
+   This specification defines a new Option Class called “Network service
+   interfaces Option Class" to carry extra context across domains that
+   offer network services to enterprises.  The new class will be
+   structured as a subrange.
 
    Under the first option class in “network service interfaces option
    class” subrange, this specification defines the following option
@@ -161,7 +200,7 @@ Table of Contents
        |              ISO-3166-2 country/subdivision code              |
        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-                Figure 2: Origin Location option type
+                Figure 3: Origin Location option type
 
 4.  Deployment and Operational Considerations
 
@@ -172,7 +211,7 @@ Table of Contents
    “IETF Review” range to be called “Network service interfaces Option
    Class”. The suggested subrange is 0x0000 - 0x0009.  IANA is also
    requested to maintain a new option type registry per option class in
-   this subrange on a “First come first served” basis.
+   this subrange for "IETF expert review".
 
 6.  Security Considerations
 

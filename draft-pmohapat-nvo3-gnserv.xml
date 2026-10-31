@@ -81,20 +81,47 @@
         service, which is usually hosted in a separate and independent
         network. This is a departure from the traditional model of
         enterprise network administrators managing service appliances
-        within their premises. Geneve is increasingly being adopted as
-        the encapsulation protocol to tie these disparate networks
-        together and offer coordinated services. At the point where a
-        service needs to be applied to an enterprise’s traffic,
-        network elements encapsulate the traffic over an on-demand
-        Geneve overlay to a service endpoint while ensuring tenant
-        isolation. Geneve options carry extra context across domains
-        to be used while applying the service. Below is a sample
-        topology where Geneve tunnel is used to carry the traffic from
-        a cloud provider to the security service provider to apply
-        security and get the traffic back to the destination.
+        within their premises.
+      </t>
+      <t>
+        Geneve is increasingly being adopted as the encapsulation
+        protocol to tie these disparate networks together and offer
+        coordinated services. At the point where a service needs to be
+        applied to an enterprise’s traffic, network elements
+        encapsulate the traffic over an on-demand Geneve overlay to a
+        service endpoint while ensuring tenant isolation for the
+        enterprise consuming the services. Geneve options carry extra
+        context across domains to be used while applying the
+        service.
+      </t>
+      <t>
+        This specification proposes a standard option class subrange
+        under the “IETF review” range for such purposes, called
+        “Network service interfaces Option Class”. It enables an
+        “implement once and offer everywhere” approach that vendors
+        and providers can leverage.
+      </t>
+      <section>
+        <name>Requirements Language</name>
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+          "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
+          RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+          interpreted as described in BCP 14 <xref target="RFC2119"/>
+          <xref target="RFC8174"/> when, and only when, they appear in
+          all capitals, as shown here.</t>
+      </section>
+    </section>
+
+    <section>
+      <name> Use cases </name>
+      <t>
+        Below is a sample topology where Geneve tunnel is
+        used to carry the traffic from a cloud provider to the
+        security service provider to apply security and get the
+        traffic back to the destination.
       </t>
       <figure>
-        <name> Example topology </name>
+        <name> Example topology 1 </name>
         <artwork><![CDATA[
                  +----------------------+
                  |     Security service |
@@ -102,7 +129,7 @@
                  +----------------------+
                          ('')
                          |  |
-                         |  | GENEVE
+                         |  | Geneve
                          |  | tunnel
                      [3] |  |
                          |  | [4]
@@ -120,37 +147,58 @@
       |Enterprise| [1] |Co-     |
       | Network  |=====|Location|
       +----------+     +--------+
-
         ]]></artwork>
       </figure>
 
       <t>
-        This specification proposes a standard option class subrange
-        under the “IETF review” range for such purposes, called
-        “Network service interfaces Option Class”. It enables an
-        “implement once and offer everywhere” approach that vendors
-        and providers can leverage.
+        Below is another topology that demonstrates tenant isolation,
+        along with the presence of enterprise network footprint across
+        cloud providers. Each enterprise's network traffic is carried
+        in separate Geneve tunnel, ensuring isolation.
       </t>
+        <figure align="center" anchor="ref1"
+                title="Example topology 2">
+            <artwork align="left"><![CDATA[
 
-      <section>
-        <name>Requirements Language</name>
-        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
-          "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
-          RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-          interpreted as described in BCP 14 <xref target="RFC2119"/>
-          <xref target="RFC8174"/> when, and only when, they appear in
-          all capitals, as shown here.</t>
-      </section>
-    </section>
+                Network services provider domain
+                +-------------------------------------------+
+                |           .                               |
+                |         .   .                             |
+                +--------.-----.----------------------------+
+                     ||  .     .Geneve
+                     ||  .     .Tunnel
+                     ||  .     .
+                     ||  .     .
+            +-------------\----/--------+         +------------------------+
+            |    Cloud provider 1       |         |    Cloud provider 2    |
+            |               : :         |         |                        |
+            | +----------+ +----------+ |         | +----------+           |
+            | |enterprise| |enterprise| |         | |enterprise|           |
+            | |  1       | |   2      | |<------->| |  2       |           |
+            | |virtual   | |virtual   | |         | |virtual   |           |
+            | |network   | |network   | |         | |network   |           |
+            | +--|-------+ +--|-------+ |         | +----------+           |
+            +----|------------|---------+         +------------------------+
+                 |            |
+            +----+-----+  +---+------+
+            |enterprise|  |enterprise|
+            |  1       |  |  2       |
+            |on-prem   |  |on-prem   |
+            |network   |  |network   |
+            +----------+  +----------+
+       ]]></artwork>
+          </figure>
 
-    <section>
-      <name>Discussion</name>
-      <t>
-      </t>
     </section>
 
     <section>
       <name>Options</name>
+      <t>
+        This specification defines a new Option Class called “Network
+        service interfaces Option Class" to carry extra context across
+        domains that offer network services to enterprises. The new
+        class will be structured as a subrange.
+      </t>
       <t>
         Under the first option class in “network service interfaces
         option class” subrange, this specification defines the
@@ -170,7 +218,7 @@
       </t>
 
       <figure>
-	<name> Origin Location option type </name>
+        <name> Origin Location option type </name>
         <artwork><![CDATA[
         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -193,21 +241,21 @@
     <section anchor="IANA">
       <name>IANA Considerations</name>
       <t>
-
         IANA is requested to assign a new option class subrange from
         the “IETF Review” range to be called “Network service
         interfaces Option Class”. The suggested subrange is 0x0000 -
-        0x0009.  IANA is also requested to maintain a new option type
-        registry per option class in this subrange on a “First come
-        first served” basis.
-
+        0x0009. IANA is also requested to maintain a new option type
+        registry per option class in this subrange for "IETF expert
+        review".
       </t>
     </section>
 
     <section anchor="Security">
         <name>Security Considerations</name>
-      <t>
-      </t>
+        <t>
+          There are no additional security risks introduced by this
+          design.
+        </t>
     </section>
 
     <!-- NOTE: The Acknowledgements and Contributors sections are at the end of this template -->
