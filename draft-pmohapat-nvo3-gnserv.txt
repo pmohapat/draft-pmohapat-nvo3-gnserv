@@ -8,6 +8,8 @@ Intended status: Standards Track                            P. Mohapatra
 Expires: 4 May 2027                                            Spinglass
                                                                P. Bhagra
                                                       Palo Alto Networks
+                                                              S. Kailasa
+                                                                  Oracle
                                                          31 October 2026
 
 
@@ -215,6 +217,7 @@ Table of Contents
 
 6.  Security Considerations
 
+   There are no additional security risks introduced by this design.
 
 7.  References
 
@@ -258,3 +261,8 @@ Authors' Addresses
    Pankaj Bhagra
    Palo Alto Networks
    Email: pankaj@paloaltonetworks.com
+
+
+   Soumya Kailasa
+   Oracle
+   Email: soumyakylasa@gmail.com
